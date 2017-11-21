@@ -1,0 +1,4 @@
+﻿  Queue with 2 stacks.cpp
+d:\github repository sda\sda---homeworks\sda homework 2, 62104\queue with two stacks\queue with 2 stacks\queue with 2 stacks.cpp(259): warning C4715: 'QueueStacks<int>::dequeue': not all control paths return a value
+d:\github repository sda\sda---homeworks\sda homework 2, 62104\queue with two stacks\queue with 2 stacks\queue with 2 stacks.cpp(257): warning C4172: returning address of local variable or temporary: x
+  Queue with 2 stacks.vcxproj -> D:\GitHub Repository SDA\SDA---Homeworks\SDA Homework 2, 62104\Queue with two stacks\x64\Debug\Queue with 2 stacks.exe
