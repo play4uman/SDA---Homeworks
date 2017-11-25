@@ -1,2 +1,2 @@
 # SDA---Homeworks
-SDA HOMEWORKS, Danail Nedko, fNo 62104
+SDA HOMEWORKS, Danail Nedkov, fNo 62104
