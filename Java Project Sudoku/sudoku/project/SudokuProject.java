@@ -20,17 +20,41 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import RMIServerPackage.SudokuServerInterface;
+import javafx.scene.layout.VBox;
+import GUI.*;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Play4u
  */
 public class SudokuProject extends Application {
+    private SudokuServerInterface server;
+    private GameScene temp = new GameScene();
     
     SolIter solution = new SolIter();
     FXTimer timer = new FXTimer();
     List<Command> historyList = new LinkedList<>();
     int historyIterator = -1;
+    
+    public void initializeRMI (){
+        String host = "localhost";
+        try{
+    //        LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.getRegistry(host, 1099);
+            server = (SudokuServerInterface) registry.lookup("ServerImplementation");
+            System.out.println("Success? ");
+        }
+        catch (Exception ex){
+            System.out.println(ex);
+            System.out.println("KOR!");
+        }
+    }
 
     public void addTextBoxes(GridPane root, TextField[] matrix) {
         int counter = 0;
@@ -107,10 +131,10 @@ public class SudokuProject extends Application {
                 historyIterator--;
             }
         });
-        
-        Button btnRedo = new Button ("Redo");
-        btnRedo.setOnAction((event)->{
-            if(historyIterator + 1 < historyList.size() && !historyList.isEmpty()){
+
+        Button btnRedo = new Button("Redo");
+        btnRedo.setOnAction((event) -> {
+            if (historyIterator + 1 < historyList.size() && !historyList.isEmpty()) {
                 historyIterator++;
                 historyList.get(historyIterator).redo();
             }
@@ -189,6 +213,7 @@ public class SudokuProject extends Application {
         return true;
     }
     
+    
     public void setButtons(GridPane gameGrid, TextField[] grid){
         Button btnCheck = new Button("Check!");
         btnCheck.setOnAction((event) -> {
@@ -203,32 +228,56 @@ public class SudokuProject extends Application {
         gameGrid.getChildren().add(btnCheck);
     }
     
+    private void setNumbers(int[][] grid){
+        TextField[] curr = temp.getSceneMatrix();
+        for (int i = 0; i < 81; i++) {
+            curr[i].setText(Integer.toString(grid[i / 9][i % 9]));
+        }
+    }
+    
 
     @Override
     public void start(Stage primaryStage) {
+        initializeRMI();
+        
+        
+        VBox rootLogin = new VBox();
+        Scene loginScene = new Scene(rootLogin, 300, 300);
+        primaryStage.setScene(loginScene);
+        
         primaryStage.setResizable(false);
-        GridPane gameGrid = new GridPane();
-        Scene scene = new Scene(gameGrid, 400, 400);
-        gameGrid.setPadding(new Insets(10, 10, 10, 10));
-
-        final TextField[] gameMatrix = new TextField[81];
-        for (int i = 0; i < 81; i++) {
-            gameMatrix[i] = new TextField();
-        }
+        
+        
+        Scene gameScene = new Scene(temp.getSceneRoot(), 400, 400);
+        
+//        final TextField[] gameMatrix = new TextField[81];
+//        for (int i = 0; i < 81; i++) {
+//            gameMatrix[i] = new TextField();
+//        }
+    
+        Button btnProceed = new Button ("Proceed");
+        btnProceed.setOnAction((e)-> {
+            primaryStage.setScene(gameScene);
+            try {
+                setNumbers(server.generateAndPassSudoku());
+            } catch (RemoteException ex) {
+                System.out.println(ex);
+            }
+        });
+        rootLogin.getChildren().add(btnProceed);
        
-        gameGrid.setGridLinesVisible(false);
-        setPlayingField(gameGrid);
-        addTextBoxes(gameGrid, gameMatrix);
-        setBorders(gameGrid);
-        solution.setMatrix(gameMatrix, Difficulty.EASY);
-        setButtons(gameGrid, gameMatrix);
-        setVerification(gameMatrix);
-        setUndoRedoButton(gameGrid);
-                
+        
+//        gameGrid.setGridLinesVisible(false);
+//        setPlayingField(gameGrid); // curr
+//        addTextBoxes(gameGrid, gameMatrix); //curr
+//        setBorders(gameGrid); //curr
+//        solution.setMatrix(gameMatrix, Difficulty.EASY); //NOT!
+//        setButtons(gameGrid, gameMatrix);
+//        setVerification(gameMatrix);//NOT!
+//        setUndoRedoButton(gameGrid);
         
         
         primaryStage.setTitle("Sudoku");
-        primaryStage.setScene(scene);
         primaryStage.show();
 
     }
