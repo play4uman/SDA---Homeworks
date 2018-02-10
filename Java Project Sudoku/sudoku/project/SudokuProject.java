@@ -46,7 +46,7 @@ public class SudokuProject extends Application {
         String host = "localhost";
         try{
     //        LocateRegistry.createRegistry(1099);
-            Registry registry = LocateRegistry.getRegistry(host, 1199);
+            Registry registry = LocateRegistry.getRegistry(host, 1099);
             server = (SudokuServerInterface) registry.lookup("Reg");
             System.out.println("Success");
         }
