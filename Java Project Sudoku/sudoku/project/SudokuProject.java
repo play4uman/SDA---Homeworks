@@ -46,13 +46,13 @@ public class SudokuProject extends Application {
         String host = "localhost";
         try{
     //        LocateRegistry.createRegistry(1099);
-            Registry registry = LocateRegistry.getRegistry(host, 1099);
-            server = (SudokuServerInterface) registry.lookup("ServerImplementation");
-            System.out.println("Success? ");
+            Registry registry = LocateRegistry.getRegistry(host, 1199);
+            server = (SudokuServerInterface) registry.lookup("Reg");
+            System.out.println("Success");
         }
         catch (Exception ex){
-            System.out.println(ex);
-            System.out.println("KOR!");
+            ex.printStackTrace();
+            System.out.println("Fail");
         }
     }
 
@@ -230,6 +230,9 @@ public class SudokuProject extends Application {
     
     private void setNumbers(int[][] grid){
         TextField[] curr = temp.getSceneMatrix();
+        
+        
+        curr[0].setText("kur");
         for (int i = 0; i < 81; i++) {
             curr[i].setText(Integer.toString(grid[i / 9][i % 9]));
         }

@@ -15,5 +15,4 @@ import java.rmi.RemoteException;
 public interface SudokuServerInterface extends Remote {
     public int[][] generateAndPassSudoku()throws RemoteException;
     public int[][] showResult(boolean correctlyAnswered)throws RemoteException;
-    public void recordStats()throws RemoteException;
 }

@@ -29,9 +29,5 @@ public class ServerImplementation extends UnicastRemoteObject implements SudokuS
             return generator.getAnswer();
         return null;
     }
-
-    @Override
-    public void recordStats() throws RemoteException{
-    }
     
 }

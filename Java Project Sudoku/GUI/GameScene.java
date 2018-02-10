@@ -23,6 +23,7 @@ public class GameScene {
     private TextField[] matrix;
 
     public GameScene() {
+        System.out.println("Initialized");
         gameGrid = new GridPane();
         matrix = new TextField[81];
         for (int i = 0; i < 81; i++) {

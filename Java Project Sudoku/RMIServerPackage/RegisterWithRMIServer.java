@@ -8,6 +8,7 @@ package RMIServerPackage;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  *
@@ -17,9 +18,10 @@ public class RegisterWithRMIServer {
     @SuppressWarnings("CallToPrintStackTrace")
     public static void main(String[] args) {
         try{
-            SudokuServerInterface server =(SudokuServerInterface) new ServerImplementation();
+            SudokuServerInterface stub = new ServerImplementation();
             Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("ServerImplementation", server);
+            registry.rebind("Reg", stub);
+            System.out.println("Success registering!");
         }
         catch(Exception ex){
             ex.printStackTrace();

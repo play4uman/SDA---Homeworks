@@ -6,13 +6,11 @@
 package RMIServerPackage;
 
 import sudoku.project.*;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Stack;
 import javafx.scene.control.TextField;
 
