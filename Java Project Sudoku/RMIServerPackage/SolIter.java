@@ -5,8 +5,10 @@
  */
 package RMIServerPackage;
 
+import java.io.Serializable;
 import sudoku.project.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -18,7 +20,7 @@ import javafx.scene.control.TextField;
  *
  * @author Play4u
  */
-public class SolIter {
+public class SolIter implements Serializable{
     
     private int matrix[][];
     private List<Integer>[] rng;
@@ -164,75 +166,125 @@ public class SolIter {
                 currIndex = visited.pop();
             }
         }
-    }
-    /*
-    private List<Integer> getPossibilities (int index){
-        List<Integer> possible = new LinkedList<>();
-        for (int i = 1; i < 10; i++){
-            if (!isInRow(index, i) && !isInCol(index, i) && !isInSquare(index, i))
-                possible.add(i);
-        }
-        return possible;
-    }
+    }   
+
     
-    private boolean isCompleted(){
+    private boolean isCompleted(int[][] toCheck){
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (matrix[i][j] == -1)
+                if (toCheck[i][j] == 0)
                     return false;
             }
         }
         return true;
     }
-    */
     
-    public void setMatrix (TextField[] grid, Difficulty diff){
-        getFullMatrix();
+    private void setDiff (Difficulty diff){
         List<Integer> holes = new ArrayList<>();
         for (int i = 0; i < 81; i++) {
             holes.add(i);
         }
         Collections.shuffle(holes);
         
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                grid[i*9 + j].setText(Integer.toString(matrix[i][j]));
-            }
-        }
-        
         switch(diff){
             case EASY:{
                 for (int i = 0; i < 40; i++) {
-                    grid[holes.get(i)].setText("");
-                }
-                for (int i = 40; i < 81; i++) {
-                    grid[holes.get(i)].setEditable(false);
+                    matrix[holes.get(i) / 9][holes.get(i) % 9] = 0;
                 }
             }
             break;
             case MEDIUM: {
                 for (int i = 0; i < 47; i++) {
-                    grid[holes.get(i)].setText("");
-                }
-                 for (int i = 47; i < 81; i++) {
-                    grid[holes.get(i)].setEditable(false);
+                    matrix[holes.get(i) / 9][holes.get(i) % 9] = 0;
                 }
             }
             break;
             case HARD: {
                 for (int i = 0; i < 52; i++) {
-                    grid[holes.get(i)].setText("");
-                }
-                 for (int i = 52; i < 81; i++) {
-                    grid[holes.get(i)].setEditable(false);
+                    matrix[holes.get(i) / 9][holes.get(i) % 9] = 0;
                 }
             }
+            break;
         }
         
     }
+       
+    private List<Integer> getPossibilities(int index) {
+        List<Integer> possible = new LinkedList<>();
+        for (int i = 1; i < 10; i++) {
+            if (!isInRow(index, i) && !isInCol(index, i) && !isInSquare(index, i)) {
+                possible.add(i);
+            }
+        }
+        return possible;
+    }
     
-    public int[][] getAnswer (){
+    private boolean placeANumberUniqueness(int index, int[][] candidate){
+        int n;
+        for (int i = 0; i < rng[index].size(); i++) {
+            n = rng[index].get(i);
+            if (!isInRow(index, n) && !isInCol(index, n) && !isInSquare(index, n)) {
+                candidate[index / 9][index % 9] = n;
+                rng[index].remove((Integer) n);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean matchesAnswer (int[][] candidate){
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (candidate[i][j] != matrix[i][j])
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    private void printStack(){
+        Stack<Integer> temp = (Stack<Integer>)visited.clone();
+        while (!temp.isEmpty()){
+            System.out.printf(temp.pop() + " ");
+        }
+        System.out.println("");
+    }
+
+    
+    
+    public int[][] getAnswer(Difficulty diff) {
+        getFullMatrix();
+        setDiff(diff);
         return matrix;
     }
+    
+    
+//    public static void main(String[] args) {
+//        getFullMatrix();
+//        for (int i = 0; i < 9; i++) {
+//            for (int j = 0; j < 9; j++) {
+//                System.out.printf(matrix[i][j] + "");
+//            }
+//            System.out.println("");
+//        }
+//        List<Integer> holes = new LinkedList<Integer>();
+//        holes.add(4);
+//        holes.add(10);
+//        holes.add(17);
+//        holes.add(25);
+//        holes.add(33);
+//        holes.add(64);
+//        holes.add(55);
+//        holes.add(11);
+//        holes.add(3);
+//        holes.add(29);
+//        holes.add(38);
+//        holes.add(1);
+//        holes.add(57);
+//        holes.add(36);
+//        holes.add(56);
+//        holes.add(66);
+//        System.out.println(uniquelySolveable(holes));
+//    }
     
 }

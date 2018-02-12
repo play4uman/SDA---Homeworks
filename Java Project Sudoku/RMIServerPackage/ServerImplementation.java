@@ -6,6 +6,7 @@
 package RMIServerPackage;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import sudoku.project.Difficulty;
 
 /**
  *
@@ -19,14 +20,14 @@ public class ServerImplementation extends UnicastRemoteObject implements SudokuS
     }
     
     @Override
-    public int[][] generateAndPassSudoku() throws RemoteException{
-          return generator.getAnswer();
+    public int[][] generateAndPassSudoku(Difficulty diff) throws RemoteException{
+          return generator.getAnswer(diff);
     }
 
     @Override
     public int[][] showResult(boolean correctlyAnswered) throws RemoteException{
         if (!correctlyAnswered)
-            return generator.getAnswer();
+            return generator.getAnswer(Difficulty.EASY);
         return null;
     }
     

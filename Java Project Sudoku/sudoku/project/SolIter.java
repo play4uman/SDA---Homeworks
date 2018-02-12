@@ -233,6 +233,7 @@ public class SolIter {
     }
     
     public int[][] getAnswer (){
+        getFullMatrix();
         return matrix;
     }
     

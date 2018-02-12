@@ -29,6 +29,7 @@ public class GameScene {
         for (int i = 0; i < 81; i++) {
             matrix[i] = new TextField();
         }
+        initialize();
     }
 
     public void setPlayingField() {
@@ -134,7 +135,6 @@ public class GameScene {
     }
     
     public GridPane getSceneRoot(){
-        initialize();
         return gameGrid;
     }
     
