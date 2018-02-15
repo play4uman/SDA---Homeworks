@@ -5,6 +5,7 @@
  */
 package RMIServerPackage;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import sudoku.project.Difficulty;
@@ -16,5 +17,6 @@ import sudoku.project.Difficulty;
  */
 public interface SudokuServerInterface extends Remote {
     public int[][] generateAndPassSudoku(Difficulty diff)throws RemoteException;
-    public int[][] showResult(boolean correctlyAnswered)throws RemoteException;
+    public int[][] checkResult(int[][] toBeChecked)throws RemoteException;
+    public void saveStats(String username, String time)throws RemoteException, IOException;
 }

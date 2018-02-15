@@ -26,8 +26,14 @@ import GUI.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.geometry.HPos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 
 /**
@@ -35,27 +41,28 @@ import javafx.scene.control.Label;
  * @author Play4u
  */
 public class SudokuProject extends Application {
+
     private SudokuServerInterface server;
     private GameScene game = new GameScene();
     private LoginScene login = new LoginScene();
-  
+    private EndScene end = new EndScene();
+
     private Difficulty diff;
     private String username;
-    
-    FXTimer timer = new FXTimer();
-    
+
+    MyTimer timer = new MyTimer();
+
     List<Command> historyList = new LinkedList<>();
     int historyIterator = -1;
-    
-    public void initializeRMI (){
+
+    public void initializeRMI() {
         String host = "localhost";
-        try{
-    //        LocateRegistry.createRegistry(1099);
+        try {
+            //        LocateRegistry.createRegistry(1099);
             Registry registry = LocateRegistry.getRegistry(host, 1099);
             server = (SudokuServerInterface) registry.lookup("Reg");
             System.out.println("Success");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Fail");
         }
@@ -76,7 +83,7 @@ public class SudokuProject extends Application {
             }
         }
     }
-    
+
     private boolean verifyInput(KeyEvent event) {
         if (event.getCode() != KeyCode.DIGIT1 && event.getCode() != KeyCode.NUMPAD1
                 && event.getCode() != KeyCode.DIGIT2 && event.getCode() != KeyCode.NUMPAD2
@@ -92,53 +99,49 @@ public class SudokuProject extends Application {
         return true;
     }
 
-    
     private void setVerification() {
-        TextField[] gameMatrix = game.getSceneMatrix();
+        TextField[] gameMatrix = game.getMatrix();
         for (int i = 0; i < 81; i++) {
             gameMatrix[i].setOnKeyReleased((event) -> {
                 TextField curr = (TextField) event.getSource();
                 if (!verifyInput(event) && curr.getText().length() != 0) {
-                    if (curr.editableProperty().get() != false){
+                    if (curr.editableProperty().get() != false) {
                         curr.setText(curr.getText()
-                            .substring(0, curr.getText().length() - 1));
+                                .substring(0, curr.getText().length() - 1));
                     }
-                }
-                else if(event.getCode() == KeyCode.BACK_SPACE 
-                        || event.getCode() == KeyCode.DELETE){
-                    DeleteCommand delete = new DeleteCommand (curr, curr.getText());
+                } else if (event.getCode() == KeyCode.BACK_SPACE
+                        || event.getCode() == KeyCode.DELETE) {
+                    DeleteCommand delete = new DeleteCommand(curr, curr.getText());
                     delete.execute();
                     for (int j = historyIterator + 1; j < historyList.size(); j++) {
                         historyList.remove(j);
                     }
                     historyList.add(delete);
                     historyIterator++;
-                }
-                else if (verifyInput(event)){
-                     TypeCommand typed = new TypeCommand(curr, curr.getText());
-                     typed.execute();
+                } else if (verifyInput(event)) {
+                    TypeCommand typed = new TypeCommand(curr, curr.getText());
+                    typed.execute();
                     for (int j = historyIterator + 1; j < historyList.size(); j++) {
                         historyList.remove(j);
                     }
-                     historyList.add(typed);
-                     historyIterator++;
+                    historyList.add(typed);
+                    historyIterator++;
                 }
             });
-            
+
         }
     }
-    
-    
-    private void setUndoRedoButton (){
-        Button btnUndo =(Button)game.getSceneRoot().getChildren().get(86);
+
+    private void setUndoRedoButton() {
+        Button btnUndo = (Button) game.getRoot().getChildren().get(86);
         btnUndo.setOnAction((event) -> {
-            if (historyIterator >= 0 && !historyList.isEmpty()){
+            if (historyIterator >= 0 && !historyList.isEmpty()) {
                 historyList.get(historyIterator).undo();
                 historyIterator--;
             }
         });
 
-        Button btnRedo =(Button)game.getSceneRoot().getChildren().get(87);
+        Button btnRedo = (Button) game.getRoot().getChildren().get(87);
         btnRedo.setOnAction((event) -> {
             if (historyIterator + 1 < historyList.size() && !historyList.isEmpty()) {
                 historyIterator++;
@@ -146,9 +149,7 @@ public class SudokuProject extends Application {
             }
         });
     }
-    
-    
-    
+
     public void setBorders(GridPane root) {
         int[] verticalIndex = {3, 7};
         int[] horizontIndex = {3, 7};
@@ -199,111 +200,179 @@ public class SudokuProject extends Application {
         }
 
     }
-    
-    
-    
-    public void setButtons(GridPane gameGrid, TextField[] grid){
+
+    public void setButtons(GridPane gameGrid, TextField[] grid) {
         Button btnCheck = new Button("Check!");
         btnCheck.setOnAction((event) -> {
         });
         GridPane.setConstraints(btnCheck, 3, 13, 3, 1);
-        
+
         gameGrid.getChildren().add(btnCheck);
     }
-    
-    private void setNumbers (int[][] solMatrix, TextField[] game){
+
+    private void setNumbers(int[][] solMatrix, TextField[] game) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (Integer.toString(solMatrix[i][j]).equals("0")){
-                    game[i*9 + j].setText("");
-                }
-                else{
-                    game[i*9 + j].setText(Integer.toString(solMatrix[i][j]));
-                    game[i*9 + j].setEditable(false);
-                    game[i*9 + j].setStyle("-fx-font-weight: bold");
+                if (Integer.toString(solMatrix[i][j]).equals("0")) {
+                    game[i * 9 + j].setText("");
+                } else {
+                    game[i * 9 + j].setText(Integer.toString(solMatrix[i][j]));
+                    game[i * 9 + j].setEditable(false);
+                    game[i * 9 + j].setStyle("-fx-font-weight: bold");
                 }
             }
         }
     }
-    
+
+    private void reset(Label lblTimer) {
+        lblTimer.setText("");
+    }
 
     @Override
     public void start(Stage primaryStage) {
         initializeRMI();
-        
-       
-        primaryStage.setResizable(false);
-        
-        Scene gameScene = new Scene(game.getSceneRoot(), 400, 400); 
-        Scene loginScene = new Scene (login.getRoot(), 600 , 600);
-        
+
+        primaryStage.setResizable(true);
+
+        Scene gameScene = new Scene(game.getRoot(), 345, 400);
+        Scene loginScene = new Scene(login.getRoot(), 600, 600);
+
         login.getRoot().setGridLinesVisible(false);
-        game.getSceneRoot().setGridLinesVisible(true);
+        game.getRoot().setGridLinesVisible(true);
         setVerification();
         setUndoRedoButton();
-        
+
         primaryStage.setScene(loginScene);
-        
-        TextField txtUsername =(TextField)login.getRoot().getChildren().get(2);
+
+        TextField txtUsername = (TextField) login.getRoot().getChildren().get(2);
         username = txtUsername.getText();
-        
-        
-        Button btnEasy =(Button)login.getRoot().getChildren().get(3);
-        Button btnMedium =(Button)login.getRoot().getChildren().get(4);
-        Button btnHard =(Button)login.getRoot().getChildren().get(5);
-        Label lblInvalidUname = (Label)login.getRoot().getChildren().get(6);
-        
-        btnEasy.setOnAction((event)->{
+
+        Label lblTimer = (Label) game.getRoot().getChildren().get(88);
+        timer.setLabel(lblTimer);
+
+        Button btnEasy = (Button) login.getRoot().getChildren().get(3);
+        Button btnMedium = (Button) login.getRoot().getChildren().get(4);
+        Button btnHard = (Button) login.getRoot().getChildren().get(5);
+        Label lblInvalidUname = (Label) login.getRoot().getChildren().get(6);
+
+        btnEasy.setOnAction((event) -> {
             username = txtUsername.getText();
-            if (!username.equals("")){
+            if (!username.equals("")) {
+                timer.runTimer();
                 diff = Difficulty.EASY;
                 primaryStage.setScene(gameScene);
-                try{
-                    setNumbers(server.generateAndPassSudoku(diff), game.getSceneMatrix());
-                }
-                catch(Exception ex){
+                try {
+                    setNumbers(server.generateAndPassSudoku(diff), game.getMatrix());
+                } catch (Exception ex) {
                     ex.printStackTrace();
-                } 
-            }
-            else{
+                }
+            } else {
                 lblInvalidUname.setText("Username cannot be empty!");
             }
         });
-        
-        btnMedium.setOnAction((event)->{
+
+        btnMedium.setOnAction((event) -> {
             username = txtUsername.getText();
             if (!username.equals("")) {
+                timer.runTimer();
                 diff = Difficulty.MEDIUM;
                 primaryStage.setScene(gameScene);
                 try {
-                    setNumbers(server.generateAndPassSudoku(diff), game.getSceneMatrix());
+                    setNumbers(server.generateAndPassSudoku(diff), game.getMatrix());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }
-            else{
+            } else {
                 lblInvalidUname.setText("Username cannot be empty!");
             }
         });
-        
-        btnHard.setOnAction((event)->{
+
+        btnHard.setOnAction((event) -> {
             username = txtUsername.getText();
-             if (!username.equals("")) {
+            if (!username.equals("")) {
+                timer.runTimer();
                 diff = Difficulty.HARD;
                 primaryStage.setScene(gameScene);
                 try {
-                    setNumbers(server.generateAndPassSudoku(diff), game.getSceneMatrix());
+                    setNumbers(server.generateAndPassSudoku(diff), game.getMatrix());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }
-            else {
+            } else {
                 lblInvalidUname.setText("Username cannot be empty!");
             }
         });
+
+        Button btnCheck = (Button) game.getRoot().getChildren().get(85);
+        btnCheck.setOnAction((event) -> {
+            int[][] answer = new int[9][9];
+            TextField[] matrix = game.getMatrix();
+            for (int i = 0; i < matrix.length; i++) {
+                if (matrix[i].getText().equals("")) {
+                    answer[i / 9][i % 9] = 0;
+                } else {
+                    answer[i / 9][i % 9] = Integer.parseInt(matrix[i].getText());
+                }
+            }
+
+            try {
+                int[][] finalAns = server.checkResult(answer);
+                if (finalAns != null) {                                 //Wrong!
+                    System.out.println("Wrong answer!");
+//                    end = new EndScene(false, lblTimer.getText());
+//                    Scene endScene = new Scene(end.getRoot(), 350, 350);
+//                    primaryStage.setScene(endScene);
+                    
+                } else {
+                    timer.stop();
+                    server.saveStats(username, lblTimer.getText());
+                    end.setStatus(true);
+                    end.setTime(lblTimer.getText());
+                    end.initialize();
+                    Scene endScene = new Scene(end.getRoot(), 350, 350);
+                    primaryStage.setScene(endScene);
+                    Button btnNewGamePos = (Button) end.getRoot().
+                            getChildren().get(3);
+                    btnNewGamePos.setOnAction((eve) -> {
+                        primaryStage.setScene(loginScene);
+                        txtUsername.setText("");
+                    });
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
         
-       
-   
+        Button btnProceed = (Button) game.getRoot().getChildren().get(90);
+        btnProceed.setOnAction((eventPrc) -> {
+            end.setStatus(false);
+            end.setTime(lblTimer.getText());
+            end.initialize();
+            primaryStage.setScene(new Scene(end.getRoot(), 350, 350));
+        });
+        
+        Button btnCheckSol = (Button) game.getRoot().getChildren().get(89);
+        btnCheckSol.setOnAction((event)->{
+              Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+              confirmAlert.setTitle("");
+              confirmAlert.setHeaderText("View results?");
+              String context = String.format("Are you sure you want to view the results?"
+                      + "%nDoing so will count as a loss and your score won't be submitted!");
+              confirmAlert.setContentText(context);
+              Optional<ButtonType> result = confirmAlert.showAndWait();
+              if (result.get() == ButtonType.OK){
+                  timer.stop();
+                  int[][] buffRes = new int[9][9];
+                  try{
+                      setNumbers(server.checkResult(buffRes), game.getMatrix());
+                  }
+                  catch(RemoteException ex){
+                      ex.printStackTrace();
+                  }
+                  btnProceed.setVisible(true);
+              }
+        });
+
         primaryStage.setTitle("Sudoku");
         primaryStage.show();
 

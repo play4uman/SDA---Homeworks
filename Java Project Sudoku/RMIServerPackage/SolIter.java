@@ -20,22 +20,24 @@ import javafx.scene.control.TextField;
  *
  * @author Play4u
  */
-public class SolIter implements Serializable{
-    
+public class SolIter implements Serializable {
+
     private int matrix[][];
+    private int answer[][];
     private List<Integer>[] rng;
     private Stack<Integer> visited;
-    
-    public SolIter (){}
-    
-    private void initialize (){
+
+    public SolIter() {
+    }
+
+    private void initialize() {
         matrix = new int[9][9];
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 matrix[i][j] = -1;
             }
         }
-        
+
         rng = new ArrayList[81];
         for (int i = 0; i < 81; i++) {
             rng[i] = new ArrayList<Integer>();
@@ -44,10 +46,10 @@ public class SolIter implements Serializable{
             }
             Collections.shuffle(rng[i]);
         }
-        
+
         visited = new Stack<>();
     }
-    
+
     private int squareIndex(int i) {
         if ((i >= 0 && i <= 2) || (i >= 9 && i <= 11) || (i >= 18 && i <= 20)) {
             return 0;
@@ -78,116 +80,122 @@ public class SolIter implements Serializable{
         }
         return 42;
     }
-    
-    private boolean isInRow (int index, int n){
+
+    private boolean isInRow(int index, int n) {
         int row = index / 9;
         int left = index % 9;
         int right = index % 9;
-        while (left >= 0){
-            if (matrix[row][left] == n)
+        while (left >= 0) {
+            if (matrix[row][left] == n) {
                 return true;
+            }
             left--;
         }
-        while (right <= 8){
-            if (matrix[row][right] == n)
+        while (right <= 8) {
+            if (matrix[row][right] == n) {
                 return true;
+            }
             right++;
         }
         return false;
     }
-    
-    private boolean isInCol (int index, int n){
+
+    private boolean isInCol(int index, int n) {
         int col = index % 9;
         int up = index / 9;
         int down = index / 9;
-        while (up >= 0){
-            if (matrix[up][col] == n)
+        while (up >= 0) {
+            if (matrix[up][col] == n) {
                 return true;
+            }
             up--;
         }
-        while (down <= 8){
-            if (matrix[down][col] == n)
+        while (down <= 8) {
+            if (matrix[down][col] == n) {
                 return true;
+            }
             down++;
         }
         return false;
     }
-    
-    private boolean isInSquare (int index, int n){
+
+    private boolean isInSquare(int index, int n) {
         int square = squareIndex(index);
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (squareIndex(i*9 + j) == square && i*9 + j != index){
-                    if (matrix[i][j] == n)
-                        return true;    
+                if (squareIndex(i * 9 + j) == square && i * 9 + j != index) {
+                    if (matrix[i][j] == n) {
+                        return true;
+                    }
                 }
             }
         }
-        
+
         return false;
     }
-    
-    private void replenishSet(int index){
+
+    private void replenishSet(int index) {
         for (int i = 1; i < 10; i++) {
             rng[index].add(i);
         }
         Collections.shuffle(rng[index]);
     }
-    
-    private boolean placeNumber (int index){
+
+    private boolean placeNumber(int index) {
         int n;
-        
+
         for (int i = 0; i < rng[index].size(); i++) {
-           
+
             n = rng[index].get(i);
             if (!isInRow(index, n) && !isInCol(index, n) && !isInSquare(index, n)) {
                 matrix[index / 9][index % 9] = n;
                 rng[index].remove((Integer) n);
                 return true;
-            } 
+            }
         }
         return false;
     }
-    
-    private void getFullMatrix (){
+
+    private void getFullMatrix() {
         initialize();
         int currIndex = 0;
-        
-        while (currIndex != 81){
-    
+
+        while (currIndex != 81) {
+
             visited.push(currIndex);
-            if (placeNumber(currIndex)){
+            if (placeNumber(currIndex)) {
                 currIndex++;
-            }
-            else{
+            } else {
                 matrix[currIndex / 9][currIndex % 9] = -1;
                 replenishSet(currIndex);
                 visited.pop();
                 currIndex = visited.pop();
             }
         }
-    }   
+    }
 
-    
-    private boolean isCompleted(int[][] toCheck){
+
+    private boolean isCompleted(int[][] toCheck) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (toCheck[i][j] == 0)
+                if (toCheck[i][j] == 0) {
                     return false;
+                }
             }
         }
         return true;
     }
-    
-    private void setDiff (Difficulty diff){
+
+    private void setDiff(Difficulty diff) {
+        getFullMatrix();
         List<Integer> holes = new ArrayList<>();
         for (int i = 0; i < 81; i++) {
             holes.add(i);
         }
         Collections.shuffle(holes);
-        
-        switch(diff){
-            case EASY:{
+
+        switch (diff) {
+            case EASY: {
                 for (int i = 0; i < 40; i++) {
                     matrix[holes.get(i) / 9][holes.get(i) % 9] = 0;
                 }
@@ -206,85 +214,129 @@ public class SolIter implements Serializable{
             }
             break;
         }
-        
+
     }
-       
-    private List<Integer> getPossibilities(int index) {
-        List<Integer> possible = new LinkedList<>();
-        for (int i = 1; i < 10; i++) {
-            if (!isInRow(index, i) && !isInCol(index, i) && !isInSquare(index, i)) {
-                possible.add(i);
+
+//    private List<Integer> getPossibilities(int index) {
+//        List<Integer> possible = new LinkedList<>();
+//        for (int i = 1; i < 10; i++) {
+//            if (!isInRow(index, i) && !isInCol(index, i) && !isInSquare(index, i)) {
+//                possible.add(i);
+//            }
+//        }
+//        return possible;
+//    }
+
+//    private boolean placeANumberUniqueness(int index, int[][] candidate) {
+//        int n;
+//        for (int i = 0; i < rng[index].size(); i++) {
+//            n = rng[index].get(i);
+//            if (!isInRow(index, n) && !isInCol(index, n) && !isInSquare(index, n)) {
+//                candidate[index / 9][index % 9] = n;
+//                rng[index].remove((Integer) n);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+//    private boolean matchesAnswer(int[][] candidate) {
+//        for (int i = 0; i < 9; i++) {
+//            for (int j = 0; j < 9; j++) {
+//                if (candidate[i][j] != matrix[i][j]) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+
+//    private void printStack() {
+//        Stack<Integer> temp = (Stack<Integer>) visited.clone();
+//        while (!temp.isEmpty()) {
+//            System.out.printf(temp.pop() + " ");
+//        }
+//        System.out.println("");
+//    }
+
+    public int[][] getUncompletedMatrix(Difficulty diff) {
+        setDiff(diff);
+        answer = new int[9][9];
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                answer[i][j] = matrix[i][j];
             }
         }
-        return possible;
+        return matrix;
     }
     
-    private boolean placeANumberUniqueness(int index, int[][] candidate){
-        int n;
-        for (int i = 0; i < rng[index].size(); i++) {
-            n = rng[index].get(i);
-            if (!isInRow(index, n) && !isInCol(index, n) && !isInSquare(index, n)) {
-                candidate[index / 9][index % 9] = n;
-                rng[index].remove((Integer) n);
+    private boolean checkRowAns(int[][] toBeChecked, int index, int n) {
+        int row = index / 9;
+        int left = index % 9;
+        int right = index % 9;
+        while (left >= 0) {
+            if (toBeChecked[row][left] == n) {
                 return true;
+            }
+            left--;
+        }
+        while (right <= 8) {
+            if (toBeChecked[row][right] == n) {
+                return true;
+            }
+            right++;
+        }
+        return false;
+    }
+
+    private boolean checkColAns(int[][] toBeChecked,int index, int n) {
+        int col = index % 9;
+        int up = index / 9;
+        int down = index / 9;
+        while (up >= 0) {
+            if (toBeChecked[up][col] == n) {
+                return true;
+            }
+            up--;
+        }
+        while (down <= 8) {
+            if (toBeChecked[down][col] == n) {
+                return true;
+            }
+            down++;
+        }
+        return false;
+    }
+
+    private boolean checkSquareAns(int[][] toBeChecked, int index, int n) {
+        int square = squareIndex(index);
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (squareIndex(i * 9 + j) == square && i * 9 + j != index) {
+                    if (toBeChecked[i][j] == n) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
     
-    private boolean matchesAnswer (int[][] candidate){
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (candidate[i][j] != matrix[i][j])
-                    return false;
+    private boolean checkNumber(int[][] toBeChecked, int index, int n) {
+        return !checkColAns(toBeChecked, index, n) || !checkRowAns(toBeChecked, index, n) || !checkSquareAns(toBeChecked, index, n);
+    }
+
+    public boolean checkAnswer(int[][] toBeChecked) {
+        for (int i = 0; i < 81; i++) {
+            if (!checkNumber(toBeChecked, i, toBeChecked[i / 9][i % 9])) {
+                return false;
             }
         }
         return true;
     }
     
-    private void printStack(){
-        Stack<Integer> temp = (Stack<Integer>)visited.clone();
-        while (!temp.isEmpty()){
-            System.out.printf(temp.pop() + " ");
-        }
-        System.out.println("");
+    public int[][] getAnswer (){
+        return answer;
     }
-
-    
-    
-    public int[][] getAnswer(Difficulty diff) {
-        getFullMatrix();
-        setDiff(diff);
-        return matrix;
-    }
-    
-    
-//    public static void main(String[] args) {
-//        getFullMatrix();
-//        for (int i = 0; i < 9; i++) {
-//            for (int j = 0; j < 9; j++) {
-//                System.out.printf(matrix[i][j] + "");
-//            }
-//            System.out.println("");
-//        }
-//        List<Integer> holes = new LinkedList<Integer>();
-//        holes.add(4);
-//        holes.add(10);
-//        holes.add(17);
-//        holes.add(25);
-//        holes.add(33);
-//        holes.add(64);
-//        holes.add(55);
-//        holes.add(11);
-//        holes.add(3);
-//        holes.add(29);
-//        holes.add(38);
-//        holes.add(1);
-//        holes.add(57);
-//        holes.add(36);
-//        holes.add(56);
-//        holes.add(66);
-//        System.out.println(uniquelySolveable(holes));
-//    }
-    
 }
+

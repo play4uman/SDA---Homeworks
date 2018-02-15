@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package RMIServerPackage;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import sudoku.project.Difficulty;
@@ -21,14 +24,25 @@ public class ServerImplementation extends UnicastRemoteObject implements SudokuS
     
     @Override
     public int[][] generateAndPassSudoku(Difficulty diff) throws RemoteException{
-          return generator.getAnswer(diff);
+          return generator.getUncompletedMatrix(diff);
     }
 
     @Override
-    public int[][] showResult(boolean correctlyAnswered) throws RemoteException{
-        if (!correctlyAnswered)
-            return generator.getAnswer(Difficulty.EASY);
-        return null;
+    public int[][] checkResult(int[][] givenAnswer) throws RemoteException{
+             if (generator.checkAnswer(givenAnswer))
+                 return null;
+             else{
+                return generator.getAnswer();
+             }    
     }
+
+    @Override
+    public void saveStats(String username, String time) throws RemoteException, IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("stats.txt", true));
+        String toWrite = String.format("%s %s %n", username, time);
+        writer.write(toWrite);
+        writer.close();
+    }
+    
     
 }

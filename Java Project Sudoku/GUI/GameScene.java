@@ -5,8 +5,12 @@
  */
 package GUI;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -33,9 +37,9 @@ public class GameScene {
     }
 
     public void setPlayingField() {
-        final int rowsConst = 13;
-        final int colConst = 13;
-        for (int i = 0; i < rowsConst; i++) {
+        final int rowsConst = 15;
+        final int colConst = 11;
+        for (int i = 0; i < colConst; i++) {
             if (i == 3 || i == 7) {
                 ColumnConstraints cConst = new ColumnConstraints(5);
                 gameGrid.getColumnConstraints().add(cConst);
@@ -99,15 +103,34 @@ public class GameScene {
     
     private void setButtons() {
         Button btnCheck = new Button("Check!");
-        GridPane.setConstraints(btnCheck, 3, 13, 3, 1);
+        GridPane.setConstraints(btnCheck, 4, 12, 3, 1);
+        btnCheck.setMinSize(105, 15);
         
         Button btnUndo = new Button ("Undo");
-        GridPane.setConstraints(btnUndo, 11, 2, 2, 2);
+        GridPane.setConstraints(btnUndo, 1, 12, 2, 1);
         
         Button btnRedo = new Button ("Redo");
-        GridPane.setConstraints(btnRedo, 11, 5, 2, 2);
+        GridPane.setConstraints(btnRedo, 9, 12, 2, 1);
         
         gameGrid.getChildren().addAll(btnCheck, btnUndo, btnRedo);
+        
+        Label lblTimer = new Label();
+        GridPane.setConstraints(lblTimer, 5, 11, 3, 1);
+        gameGrid.getChildren().add(lblTimer);
+        
+        String strBtnCheckSol = String.format("Check%nsolution");
+        Button btnCheckSolution = new Button (strBtnCheckSol);
+        GridPane.setConstraints(btnCheckSolution, 4, 13, 3, 2);
+        GridPane.setHalignment(btnCheckSolution, HPos.CENTER);
+        GridPane.setValignment(btnCheckSolution, VPos.BOTTOM);
+        
+        gameGrid.getChildren().add(btnCheckSolution);
+        
+        Button btnProceed = new Button("Proceed");
+        GridPane.setConstraints(btnProceed, 8, 14, 3, 1);
+        GridPane.setHalignment(btnProceed, HPos.CENTER);
+        btnProceed.setVisible(false);
+        gameGrid.getChildren().add(btnProceed);
         
        /*
             btnUndo.setOnAction((event) -> {
@@ -134,11 +157,11 @@ public class GameScene {
         setButtons();
     }
     
-    public GridPane getSceneRoot(){
+    public GridPane getRoot(){
         return gameGrid;
     }
     
-    public TextField[] getSceneMatrix(){
+    public TextField[] getMatrix(){
         return matrix;
     }
 }
