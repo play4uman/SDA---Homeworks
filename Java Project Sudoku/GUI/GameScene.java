@@ -7,7 +7,6 @@ package GUI;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,7 +14,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 
 /**
  *
@@ -131,6 +132,15 @@ public class GameScene {
         GridPane.setHalignment(btnProceed, HPos.CENTER);
         btnProceed.setVisible(false);
         gameGrid.getChildren().add(btnProceed);
+        
+        String strWrongAns = String.format("Wrong%nanswer!");
+        Label lblWrongAnswer = new Label(strWrongAns);
+        lblWrongAnswer.setFont(new Font("Arial", 18));
+        lblWrongAnswer.setTextFill(Color.web("#ff0000"));
+        lblWrongAnswer.setVisible(false);
+        GridPane.setConstraints(lblWrongAnswer, 0, 13, 3, 2);
+        GridPane.setHalignment(lblWrongAnswer, HPos.CENTER);
+        gameGrid.getChildren().add(lblWrongAnswer);
         
        /*
             btnUndo.setOnAction((event) -> {

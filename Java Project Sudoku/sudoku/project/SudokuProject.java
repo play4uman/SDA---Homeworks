@@ -7,31 +7,20 @@ package sudoku.project;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import RMIServerPackage.SudokuServerInterface;
-import javafx.scene.layout.VBox;
 import GUI.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.geometry.HPos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -43,9 +32,16 @@ import javafx.scene.control.Label;
 public class SudokuProject extends Application {
 
     private SudokuServerInterface server;
-    private GameScene game = new GameScene();
+    
     private LoginScene login = new LoginScene();
+    private GameScene game = new GameScene();
     private EndScene end = new EndScene();
+    
+    private Scene loginScene = new Scene(login.getRoot(), 600, 600);
+    private Scene gameScene = new Scene(game.getRoot(), 345, 420);
+    private Scene endScene = new Scene(end.getRoot(), 350, 350);
+    
+    private List<Integer> lockedCells = new LinkedList<>();
 
     private Difficulty diff;
     private String username;
@@ -68,21 +64,6 @@ public class SudokuProject extends Application {
         }
     }
 
-    public void addTextBoxes(GridPane root, TextField[] matrix) {
-        int counter = 0;
-        for (int i = 0; i < 11; i++) {
-            for (int j = 0; j < 11; j++) {
-                if (i != 3 && i != 7 && j != 3 && j != 7) {
-                    GridPane.setConstraints(matrix[counter], j, i);
-
-                    //    GridPane.setFillWidth(matrix[counter], true);
-                    GridPane.setFillHeight(matrix[counter], true);
-                    root.getChildren().add(matrix[counter]);
-                    counter++;
-                }
-            }
-        }
-    }
 
     private boolean verifyInput(KeyEvent event) {
         if (event.getCode() != KeyCode.DIGIT1 && event.getCode() != KeyCode.NUMPAD1
@@ -150,65 +131,6 @@ public class SudokuProject extends Application {
         });
     }
 
-    public void setBorders(GridPane root) {
-        int[] verticalIndex = {3, 7};
-        int[] horizontIndex = {3, 7};
-        for (int i = 0; i < verticalIndex.length; i++) {
-            Line border = new Line();
-            GridPane.setConstraints(border, verticalIndex[i], 0, 1, 11);
-            border.setStartX(12.5);
-            border.setStartY(0);
-            border.setEndX(12.5);
-            border.setEndY(270);
-            border.setStrokeWidth(4);
-            root.getChildren().add(border);
-        }
-        for (int j = 0; j < horizontIndex.length; j++) {
-            Line border = new Line();
-            GridPane.setConstraints(border, 0, horizontIndex[j], 11, 1);
-            border.setStartX(0);
-            border.setStartY(12.5);
-            border.setEndX(325);
-            border.setEndY(12.5);
-            border.setStrokeWidth(4);
-            root.getChildren().add(border);
-        }
-
-    }
-
-    public void setPlayingField(GridPane root) {
-        final int rowsConst = 13;
-        final int colConst = 13;
-        for (int i = 0; i < rowsConst; i++) {
-            if (i == 3 || i == 7) {
-                ColumnConstraints cConst = new ColumnConstraints(5);
-                root.getColumnConstraints().add(cConst);
-            } else {
-                ColumnConstraints cConst = new ColumnConstraints(35);
-                root.getColumnConstraints().add(cConst);
-            }
-        }
-        for (int i = 0; i < rowsConst; i++) {
-            if (i == 3 || i == 7) {
-                RowConstraints rConst = new RowConstraints(5);
-                root.getRowConstraints().add(rConst);
-            } else {
-                RowConstraints rConst = new RowConstraints(30);
-                root.getRowConstraints().add(rConst);
-            }
-
-        }
-
-    }
-
-    public void setButtons(GridPane gameGrid, TextField[] grid) {
-        Button btnCheck = new Button("Check!");
-        btnCheck.setOnAction((event) -> {
-        });
-        GridPane.setConstraints(btnCheck, 3, 13, 3, 1);
-
-        gameGrid.getChildren().add(btnCheck);
-    }
 
     private void setNumbers(int[][] solMatrix, TextField[] game) {
         for (int i = 0; i < 9; i++) {
@@ -219,26 +141,29 @@ public class SudokuProject extends Application {
                     game[i * 9 + j].setText(Integer.toString(solMatrix[i][j]));
                     game[i * 9 + j].setEditable(false);
                     game[i * 9 + j].setStyle("-fx-font-weight: bold");
+                    lockedCells.add(i*9 + j);
                 }
             }
         }
     }
-
-    private void reset(Label lblTimer) {
-        lblTimer.setText("");
+    
+    private void unlockCells (){
+        for (int i = 0; i < lockedCells.size(); i++) {
+            game.getMatrix()[lockedCells.get(i)].setEditable(true);
+        }
+        lockedCells.clear();
+        for (int i = 0; i < 81; i++) {
+            game.getMatrix()[i].setStyle("-fx-font-weight: normal");
+        }
     }
+
 
     @Override
     public void start(Stage primaryStage) {
         initializeRMI();
-
+        
         primaryStage.setResizable(true);
-
-        Scene gameScene = new Scene(game.getRoot(), 345, 400);
-        Scene loginScene = new Scene(login.getRoot(), 600, 600);
-
-        login.getRoot().setGridLinesVisible(false);
-        game.getRoot().setGridLinesVisible(true);
+        
         setVerification();
         setUndoRedoButton();
 
@@ -302,6 +227,8 @@ public class SudokuProject extends Application {
                 lblInvalidUname.setText("Username cannot be empty!");
             }
         });
+ 
+        Label lblWrongAns = (Label) game.getRoot().getChildren().get(91);
 
         Button btnCheck = (Button) game.getRoot().getChildren().get(85);
         btnCheck.setOnAction((event) -> {
@@ -317,26 +244,16 @@ public class SudokuProject extends Application {
 
             try {
                 int[][] finalAns = server.checkResult(answer);
-                if (finalAns != null) {                                 //Wrong!
-                    System.out.println("Wrong answer!");
-//                    end = new EndScene(false, lblTimer.getText());
-//                    Scene endScene = new Scene(end.getRoot(), 350, 350);
-//                    primaryStage.setScene(endScene);
+                if (finalAns != null) {
+                    lblWrongAns.setVisible(true);
                     
                 } else {
                     timer.stop();
-                    server.saveStats(username, lblTimer.getText());
-                    end.setStatus(true);
+                    server.saveStats(username, lblTimer.getText());;
                     end.setTime(lblTimer.getText());
-                    end.initialize();
-                    Scene endScene = new Scene(end.getRoot(), 350, 350);
+                    end.setEndGameText(true);
                     primaryStage.setScene(endScene);
-                    Button btnNewGamePos = (Button) end.getRoot().
-                            getChildren().get(3);
-                    btnNewGamePos.setOnAction((eve) -> {
-                        primaryStage.setScene(loginScene);
-                        txtUsername.setText("");
-                    });
+                    
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -344,11 +261,10 @@ public class SudokuProject extends Application {
         });
         
         Button btnProceed = (Button) game.getRoot().getChildren().get(90);
-        btnProceed.setOnAction((eventPrc) -> {
-            end.setStatus(false);
+        btnProceed.setOnAction((eventPrc) -> {;
             end.setTime(lblTimer.getText());
-            end.initialize();
-            primaryStage.setScene(new Scene(end.getRoot(), 350, 350));
+            end.setEndGameText(false);
+            primaryStage.setScene(endScene);
         });
         
         Button btnCheckSol = (Button) game.getRoot().getChildren().get(89);
@@ -361,6 +277,7 @@ public class SudokuProject extends Application {
               confirmAlert.setContentText(context);
               Optional<ButtonType> result = confirmAlert.showAndWait();
               if (result.get() == ButtonType.OK){
+                  btnCheck.setDisable(true);                     
                   timer.stop();
                   int[][] buffRes = new int[9][9];
                   try{
@@ -371,6 +288,31 @@ public class SudokuProject extends Application {
                   }
                   btnProceed.setVisible(true);
               }
+              
+        
+        });
+        
+        Button btnNewGamePos = (Button) end.getRoot().getChildren().get(3);
+        btnNewGamePos.setOnAction((eventNewGamePos) -> {
+            primaryStage.setScene(loginScene);
+            txtUsername.setText("");
+            btnCheck.setDisable(false);
+            btnProceed.setVisible(false);
+            lblWrongAns.setVisible(false);
+            historyList.clear();
+            historyIterator = -1;
+            unlockCells();
+        }); 
+       
+        Button btnNewGameNeg = (Button) end.getRoot().getChildren().get(4);
+        btnNewGameNeg.setOnAction((eventNewGameNeg) -> {
+            Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            exitAlert.setTitle("");
+            exitAlert.setHeaderText("Exit game?");
+            Optional<ButtonType> resultExit = exitAlert.showAndWait();
+            if (resultExit.get() == ButtonType.OK) {
+                Platform.exit();
+            }
         });
 
         primaryStage.setTitle("Sudoku");

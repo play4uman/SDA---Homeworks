@@ -23,7 +23,7 @@ public class RegisterWithRMIServer {
             registry.rebind("Reg", stub);
             System.out.println("Success registering!");
         }
-        catch(Exception ex){
+        catch(RemoteException ex){
             ex.printStackTrace();
         }
     }

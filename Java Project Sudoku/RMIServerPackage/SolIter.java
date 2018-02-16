@@ -8,13 +8,9 @@ package RMIServerPackage;
 import java.io.Serializable;
 import sudoku.project.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import javafx.scene.control.TextField;
 
 /**
  *
@@ -175,19 +171,17 @@ public class SolIter implements Serializable {
     }
 
 
-    private boolean isCompleted(int[][] toCheck) {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (toCheck[i][j] == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     private void setDiff(Difficulty diff) {
         getFullMatrix();
+        answer = new int[9][9];
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                answer[i][j] = matrix[i][j];
+            }
+        }
+      
+        
         List<Integer> holes = new ArrayList<>();
         for (int i = 0; i < 81; i++) {
             holes.add(i);
@@ -217,56 +211,9 @@ public class SolIter implements Serializable {
 
     }
 
-//    private List<Integer> getPossibilities(int index) {
-//        List<Integer> possible = new LinkedList<>();
-//        for (int i = 1; i < 10; i++) {
-//            if (!isInRow(index, i) && !isInCol(index, i) && !isInSquare(index, i)) {
-//                possible.add(i);
-//            }
-//        }
-//        return possible;
-//    }
-
-//    private boolean placeANumberUniqueness(int index, int[][] candidate) {
-//        int n;
-//        for (int i = 0; i < rng[index].size(); i++) {
-//            n = rng[index].get(i);
-//            if (!isInRow(index, n) && !isInCol(index, n) && !isInSquare(index, n)) {
-//                candidate[index / 9][index % 9] = n;
-//                rng[index].remove((Integer) n);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    private boolean matchesAnswer(int[][] candidate) {
-//        for (int i = 0; i < 9; i++) {
-//            for (int j = 0; j < 9; j++) {
-//                if (candidate[i][j] != matrix[i][j]) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
-
-//    private void printStack() {
-//        Stack<Integer> temp = (Stack<Integer>) visited.clone();
-//        while (!temp.isEmpty()) {
-//            System.out.printf(temp.pop() + " ");
-//        }
-//        System.out.println("");
-//    }
 
     public int[][] getUncompletedMatrix(Difficulty diff) {
         setDiff(diff);
-        answer = new int[9][9];
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                answer[i][j] = matrix[i][j];
-            }
-        }
         return matrix;
     }
     

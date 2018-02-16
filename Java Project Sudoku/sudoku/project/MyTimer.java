@@ -5,29 +5,14 @@
  */
 package sudoku.project;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.concurrent.Task;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 /**
  *
  * @author Play4u
  */
-public class MyTimer extends Application {
+public class MyTimer {
    Label lblToModify;
    boolean status;
     
@@ -74,41 +59,6 @@ public class MyTimer extends Application {
    public void setLabel (Label lblTarget){
        lblToModify = lblTarget;
    }
-    
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        lblToModify = new Label("");
-        GridPane root = new GridPane();
-        Scene scene = new Scene(root, 350, 350);
-        
-        
-        
-        Button btnStop = new Button("Stop");
-        btnStop.setOnAction((event)->{
-            stop();
-        });
-        
-        Button btnStart = new Button("Start");
-        btnStart.setOnAction((event)->{
-            runTimer();
-        });
-        
-        GridPane.setConstraints(btnStart, 0, 0);
-        GridPane.setConstraints(btnStop, 1, 0);
-        GridPane.setConstraints(lblToModify, 0, 1);
-       
-        
-        root.getChildren().addAll(lblToModify, btnStop, btnStart);
-        
-
-        
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-    
-    public static void main(String[] args) {
-        launch(args);
-    }
 
 }

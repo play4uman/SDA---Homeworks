@@ -5,11 +5,8 @@
  */
 package GUI;
 
-import javafx.application.Application;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
@@ -17,7 +14,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 /**
  *
@@ -26,22 +22,20 @@ import javafx.stage.Stage;
 public class EndScene {
 
     GridPane root;
-    boolean status;
-    String time;
+    private String time;
+    private Label lblEnd;
+    private Label lblYourTime;
 
-    public EndScene(boolean status, String time) {
-        this.status = status;
+    public EndScene(String time) {
         this.time = time;
         root = new GridPane();
+        initialize();
     }
     
     public EndScene (){
-        this(true, null);
+        this(null);
         root = new GridPane();
-    }
-    
-    public void setStatus(boolean status){
-        this.status = status;
+        initialize();
     }
     
     public void setTime(String time){
@@ -61,22 +55,14 @@ public class EndScene {
             root.getColumnConstraints().add(cCon);
         }
 
-        Label lblEnd = new Label();
+        lblEnd = new Label();
         lblEnd.setFont(new Font("Arial", 32));
         GridPane.setHalignment(lblEnd, HPos.CENTER);
         GridPane.setValignment(lblEnd, VPos.CENTER);
         GridPane.setConstraints(lblEnd, 0, 0, 10, 4);
         
-        if (status) {
-            String strWin = String.format("Congratulations!%n\tYou win!");
-            lblEnd.setText(strWin);
-            lblEnd.setTextFill(Color.web("#ff0000"));
-        } else {
-            lblEnd.setText("You lose :(");
-            lblEnd.setTextFill(Color.web("#0000ff"));
-        }
         
-        Label lblYourTime = new Label(new String("Your time: " + time));
+        lblYourTime = new Label();
         lblYourTime.setFont(new Font("Arial", 18));
         GridPane.setConstraints(lblYourTime, 0, 4, 10, 1);
         GridPane.setHalignment(lblYourTime, HPos.CENTER);
@@ -96,6 +82,18 @@ public class EndScene {
         GridPane.setConstraints(btnNewGameNeg, 6, 7, 3, 2);
         
         root.getChildren().addAll(lblEnd, lblYourTime, lblNewGame, btnNewGamePos ,btnNewGameNeg);
+    }
+    
+    public void setEndGameText(boolean status){
+        if (status) {
+            String strWin = String.format("Congratulations!%n\tYou win!");
+            lblEnd.setText(strWin);
+            lblEnd.setTextFill(Color.web("#ff0000"));
+            lblYourTime.setText("Your time: " + time);
+        } else {
+            lblEnd.setText("You lose :(");
+            lblEnd.setTextFill(Color.web("#0000ff"));
+        }
     }
 
     public GridPane getRoot() {
