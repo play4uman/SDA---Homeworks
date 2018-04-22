@@ -36,6 +36,8 @@ public class GameScene {
         }
         initialize();
     }
+    
+ 
 
     public void setPlayingField() {
         final int rowsConst = 15;
@@ -75,6 +77,7 @@ public class GameScene {
             }
         }
     }
+
     
     private void setBorders() {
         int[] verticalIndex = {3, 7};
@@ -100,7 +103,7 @@ public class GameScene {
             gameGrid.getChildren().add(border);
         }
     }
-    
+
     
     private void setButtons() {
         Button btnCheck = new Button("Check!");
@@ -142,22 +145,8 @@ public class GameScene {
         GridPane.setHalignment(lblWrongAnswer, HPos.CENTER);
         gameGrid.getChildren().add(lblWrongAnswer);
         
-       /*
-            btnUndo.setOnAction((event) -> {
-            if (historyIterator >= 0 && !historyList.isEmpty()){
-                historyList.get(historyIterator).undo();
-                historyIterator--;
-            }
-        });
-            btnRedo.setOnAction((event)->{
-            if(historyIterator + 1 < historyList.size() && !historyList.isEmpty()){
-                historyIterator++;
-                historyList.get(historyIterator).redo();
-            }
-        }); 
-        */
     }
-    
+ 
 
     private void initialize() {
         gameGrid.setPadding(new Insets(10, 10, 10, 10));
@@ -166,10 +155,13 @@ public class GameScene {
         setBorders();
         setButtons();
     }
+
     
     public GridPane getRoot(){
         return gameGrid;
     }
+    
+  
     
     public TextField[] getMatrix(){
         return matrix;

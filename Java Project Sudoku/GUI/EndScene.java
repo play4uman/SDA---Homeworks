@@ -19,8 +19,11 @@ import javafx.scene.text.Font;
  *
  * @author Play4u
  */
-public class EndScene {
 
+
+public class EndScene {
+    
+    
     GridPane root;
     private String time;
     private Label lblEnd;
@@ -41,6 +44,8 @@ public class EndScene {
     public void setTime(String time){
         this.time = time;
     }
+    
+
 
     public void initialize() {
         for (int i = 0; i < 10; i++) {
@@ -84,6 +89,7 @@ public class EndScene {
         root.getChildren().addAll(lblEnd, lblYourTime, lblNewGame, btnNewGamePos ,btnNewGameNeg);
     }
     
+    
     public void setEndGameText(boolean status){
         if (status) {
             String strWin = String.format("Congratulations!%n\tYou win!");
@@ -95,6 +101,7 @@ public class EndScene {
             lblEnd.setTextFill(Color.web("#0000ff"));
         }
     }
+
 
     public GridPane getRoot() {
         return root;

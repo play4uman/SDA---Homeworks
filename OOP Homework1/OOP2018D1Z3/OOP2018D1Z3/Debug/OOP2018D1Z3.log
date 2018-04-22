@@ -1,0 +1,3 @@
+﻿  Driver.cpp
+c:\users\play4u\source\repos\oop2018d1z3\oop2018d1z3\driver.cpp(17): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  OOP2018D1Z3.vcxproj -> C:\Users\Play4u\source\repos\OOP2018D1Z3\Debug\OOP2018D1Z3.exe
